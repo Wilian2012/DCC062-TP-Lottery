@@ -16,7 +16,18 @@
 const char lottName[]="LOTT";
 //=====Funcoes Auxiliares=====
 
-
+// Retorna total de tickets de todos os processos prontos
+static int contarTicketsProntos(Process *lista) {
+    int total = 0;
+    Process *p;
+    for (p = lista; p != NULL; p = processGetNext(p)) {
+        if (processGetStatus(p) == PROC_READY) {
+            LotterySchedParams *params = processGetSchedParams(p);
+            total += params->num_tickets;
+        }
+    }
+    return total;
+}
 
 
 
@@ -27,8 +38,21 @@ const char lottName[]="LOTT";
 //conforme o algoritmo Lottery Scheduling
 //Deve envolver a inicializacao de possiveis parametros gerais
 //Deve envolver o registro do algoritmo junto ao escalonador
-void lottInitSchedInfo() {
+void lottInitSchedInfo(void) {
 	//...
+   SchedInfo info;
+    strncpy(info.name, lottName, MAX_NAME_LEN);
+    info.initParamsFn = lottInitSchedParams;
+    info.notifyProcStatusChangeFn = lottNotifyProcStatusChange;
+    info.scheduleFn = lottSchedule;
+    info.releaseParamsFn = lottReleaseParams;
+
+    // Registrar no slot do escalonador
+    schedRegisterScheduler(&info);
+
+    // Inicializar semente do rand
+    srand((unsigned int)time(NULL));
+
 }
 
 //Inicializa os parametros de escalonamento de um processo p, chamada 
