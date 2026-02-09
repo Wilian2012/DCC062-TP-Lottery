@@ -59,6 +59,14 @@ void lottInitSchedInfo(void) {
 //normalmente quando o processo e' associado ao slot de Lottery
 void lottInitSchedParams(Process *p, void *params) {
 	//...
+	LotterySchedParams *parametros = (LotterySchedParams*)params;
+
+    if (!parametros) {
+        parametros = malloc(sizeof(LotterySchedParams));
+        parametros->num_tickets = 1; // valor padrao
+    }
+
+    processSetSchedParams(processo, parametros);
 }
 
 //Recebe a notificação de que um processo sob gerência de Lottery mudou de estado
