@@ -78,6 +78,25 @@ void lottNotifyProcStatusChange(Process* p) {
 //Retorna o proximo processo a obter a CPU, conforme o algortimo Lottery 
 Process* lottSchedule(Process *plist) {
 	//...
+	int total_tickets = contarTicketsProntos(lista);
+    if (total_tickets == 0) return NULL; // nenhum processo pronto
+
+    // Escolher ticket vencedor
+    int ticket_sorteado = rand() % total_tickets + 1;
+
+    // Percorrer lista e somar tickets acumulados
+    int acumulador = 0;
+    Process *p;
+    for (p = lista; p != NULL; p = processGetNext(p)) {
+        if (processGetStatus(p) == PROC_READY) {
+            LotterySchedParams *parametros = processGetSchedParams(p);
+            acumulador += parametros->num_tickets;
+            if (acumulador >= ticket_sorteado) {
+                return p;
+            }
+        }
+    }
+
 	return NULL;
 }
 
